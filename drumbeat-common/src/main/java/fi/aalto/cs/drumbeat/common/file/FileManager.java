@@ -8,11 +8,19 @@ import java.text.DecimalFormat;
 
 public class FileManager {
 	
+	public static final String FILE_NAME_SEPARATOR = File.separator;
+	
 	public static final String FILE_EXTENSION_XML = "xml";
 
 	public static final String FILE_EXTENSION_GZIP = "gz";
 	public static final String FILE_EXTENSION_ZIP = "zip";
 
+	/**
+	 * Creates a directory with a specified path. If some parent directory does not exist then it is created as well.
+	 * 
+	 * @param directoryPath
+	 * @return
+	 */
 	public static File createDirectory(String directoryPath) {
 		File directory = new File(directoryPath);
 		if (!directory.exists()) {
@@ -21,8 +29,14 @@ public class FileManager {
 		return directory;
 	}
 	
-	public static String createFileName(File directory, String fileName) {
-		return String.format("%s%s%s", directory.getAbsolutePath(), File.separatorChar, fileName);
+	
+	
+	public static String buildFilePath(String directoryPath, String fileName) {
+		return directoryPath != null ? String.format("%s%s%s", directoryPath, File.separatorChar, fileName) : fileName; 
+	}
+
+	public static String buildFilePath(File directory, String fileName) {
+		return directory != null ? buildFilePath(directory.getPath(), fileName) : fileName;
 	}
 	
 	public static File createFile(String filePath) throws IOException {
@@ -57,47 +71,72 @@ public class FileManager {
 	    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 	
-	public static String createFileNameWithExtension(String filePath, String extension) {
-		
-		String tempFilePath = filePath;
-		
-		String[] tokens = extension.split("\\.");
-		
-		int firstExtentionToBeAdded = tokens.length;
-		
-		for (int i = tokens.length - 1; i >= 0; --i) {
-			tokens[i] = "." + tokens[i];
-			if (tempFilePath.endsWith(tokens[i])) {
-				tempFilePath = tempFilePath.substring(0, tempFilePath.length() - tokens[i].length());
-			} else {
-				firstExtentionToBeAdded = i;
-			}
-		}
-		
-		for (int i = firstExtentionToBeAdded; i < tokens.length; ++i) {
-			filePath += tokens[i];
-		}
-		
-		return filePath;
-	}
+//	public static String createFileNameWithExtension(String filePath, String extension) {
+//		
+//		String tempFilePath = filePath;
+//		
+//		String[] tokens = extension.split("\\.");
+//		
+//		int firstExtentionToBeAdded = tokens.length;
+//		
+//		for (int i = tokens.length - 1; i >= 0; --i) {
+//			tokens[i] = "." + tokens[i];
+//			if (tempFilePath.endsWith(tokens[i])) {
+//				tempFilePath = tempFilePath.substring(0, tempFilePath.length() - tokens[i].length());
+//			} else {
+//				firstExtentionToBeAdded = i;
+//			}
+//		}
+//		
+//		for (int i = firstExtentionToBeAdded; i < tokens.length; ++i) {
+//			filePath += tokens[i];
+//		}
+//		
+//		return filePath;
+//	}
 	
+	/**
+	 * Gets the user's current directory
+	 * 
+	 * @return
+	 */
 	public static String getCurrentDirectory() {
 		return System.getProperty("user.dir");
 	}
 	
+	/**
+	 * Gets the file name for the file with the specified file path
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	public static String getFileName(String filePath) {
 		File file = new File(filePath);
 		return file.getName();
 	}
 	
-	public static boolean hasFileExtension(String filePath, String extension) {
+	/**
+	 * Checks if a file has a specified extension
+	 *  
+	 * @param filePath
+	 * @param extension
+	 * @return
+	 */
+	public static boolean checkFileHasExtension(String filePath, String extension) {
 		String fileName = getFileName(filePath);
 		int indexOfPoint = fileName.lastIndexOf('.');
 		String fileExtension = indexOfPoint >= 0 ? fileName.substring(indexOfPoint + 1) : fileName;
 		return fileExtension.equalsIgnoreCase(extension);
 	}
 	
-	public static boolean hasAnyFileExtension(String filePath, String... extensions) {
+	/**
+	 * Checks if a file has any of specified extensions.
+	 * 
+	 * @param filePath
+	 * @param extensions
+	 * @return
+	 */
+	public static boolean checkFileHasAnyOfExtensions(String filePath, String... extensions) {
 		String fileName = getFileName(filePath);
 		int indexOfPoint = fileName.lastIndexOf('.');
 		String fileExtension = indexOfPoint >= 0 ? fileName.substring(indexOfPoint + 1) : fileName;
@@ -110,17 +149,26 @@ public class FileManager {
 		return false;
 	}
 
-	public static String removeLastExtension(String filePath) {
-		int index = filePath.lastIndexOf('.');
+	/**
+	 * Removes the file extension from the file path
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static String removeFileExtension(String filePath) {
+		File file = new File(filePath);
+		File parent = file.getParentFile();
+		String fileName = file.getName();
+		
+		int index = fileName.lastIndexOf('.');
 		if (index >= 0) {
-			return filePath.substring(0, index);
-		} else {
-			return filePath;
+			fileName = fileName.substring(0, index);
 		}
+		return parent != null ? buildFilePath(parent, fileName) : fileName;
 	}
 
-	public static String replaceLastExtension(String filePath, String newExtension) {
-		return removeLastExtension(filePath) + "." + newExtension;
+	public static String replaceFileExtension(String filePath, String newExtension) {
+		return removeFileExtension(filePath) + "." + newExtension;
 	}
 
 }

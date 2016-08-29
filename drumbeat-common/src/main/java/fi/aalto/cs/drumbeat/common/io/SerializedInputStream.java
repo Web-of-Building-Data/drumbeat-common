@@ -59,13 +59,13 @@ public class SerializedInputStream {
 			throw new IllegalArgumentException("Serialization format is null");
 		}
 		
-		if (FileManager.hasFileExtension(serializationInfo, FileManager.FILE_EXTENSION_GZIP)) {
+		if (FileManager.checkFileHasExtension(serializationInfo, FileManager.FILE_EXTENSION_GZIP)) {
 			
 			return getUncompressedInputStream(
 					new GZIPInputStream(in),
-					FileManager.removeLastExtension(serializationInfo));
+					FileManager.removeFileExtension(serializationInfo));
 			
-		} else if (FileManager.hasFileExtension(serializationInfo, FileManager.FILE_EXTENSION_ZIP)) {
+		} else if (FileManager.checkFileHasExtension(serializationInfo, FileManager.FILE_EXTENSION_ZIP)) {
 			
 			ZipInputStream zipInput = new ZipInputStream(in);
 			return getUncompressedInputStream(

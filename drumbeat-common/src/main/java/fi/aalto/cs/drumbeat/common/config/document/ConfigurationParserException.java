@@ -1,8 +1,8 @@
 package fi.aalto.cs.drumbeat.common.config.document;
 
-import fi.aalto.cs.drumbeat.common.DrumbeatException;
+import fi.aalto.cs.drumbeat.common.DrbException;
 
-public class ConfigurationParserException extends DrumbeatException {
+public class ConfigurationParserException extends DrbException {
 
 	private static final long serialVersionUID = 1L;
 
