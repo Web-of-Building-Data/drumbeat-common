@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>fi.aalto.cs.drumbeat</groupId>
-	<artifactId>drumbeat-common</artifactId>
-	<version>0.11.2</version>
+	<artifactId>drumbeat2-common</artifactId>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -28,9 +28,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:Web-of-Building-Data/drumbeat-bim2ld.git</connection>
-		<developerConnection>scm:git:git@github.com:Web-of-Building-Data/drumbeat-bim2ld.git</developerConnection>
-		<url>git@github.com:Web-of-Building-Data/drumbeat-bim2ld.git</url>
+		<connection>scm:git:git@github.com:Web-of-Building-Data/drumbeat2-bim2ld.git</connection>
+		<developerConnection>scm:git:git@github.com:Web-of-Building-Data/drumbeat2-bim2ld.git</developerConnection>
+		<url>git@github.com:Web-of-Building-Data/drumbeat2-bim2ld.git</url>
 	</scm>
 
 	<properties>
@@ -112,6 +112,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
@@ -135,6 +136,7 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
+			 -->
 		</plugins>
 	</build>
 
