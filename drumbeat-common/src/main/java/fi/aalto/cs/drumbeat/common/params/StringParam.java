@@ -2,7 +2,7 @@ package fi.aalto.cs.drumbeat.common.params;
 
 import java.util.Collection;
 
-public class StringParam extends TypedParam<String> {
+public class StringParam extends SimpleTypeParam<String> {
 
 	public StringParam() {
 		this(null, null);

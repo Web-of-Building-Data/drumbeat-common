@@ -8,78 +8,72 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import fi.aalto.cs.drumbeat.common.file.FileManager;
+import org.apache.commons.io.FilenameUtils;
 
-public class SerializedInputStream {
+import fi.aalto.cs.drumbeat.common.string.StringUtils;
+
+/**
+ * An object which wraps an {@link InputStream}, which can be uncompressed or compressed with GZIP or ZIP formats.  
+ *
+ */
+public class CompressedInputStreamManager {
 	
-	private InputStream in;
-	private String serializationInfo;
+	private final InputStream in;
+	private final String fileExtension;
+	private final String fileExtensionNoCompressionFormat;
+	private String compressionFormat;
 	
-	public SerializedInputStream(String filePath) throws FileNotFoundException {
-		this.in = new FileInputStream(filePath);
-		this.serializationInfo = filePath;		
+	
+	public CompressedInputStreamManager(String filePath) throws FileNotFoundException {
+		this(new FileInputStream(filePath), filePath);
+	}
+
+	public CompressedInputStreamManager(File file) throws FileNotFoundException {
+		this(new FileInputStream(file), file.getName());
 	}
 	
-	public SerializedInputStream(File file) throws FileNotFoundException {
-		this.in = new FileInputStream(file);
-		this.serializationInfo = file.getName();		
-	}
-
-	public SerializedInputStream(InputStream in, String serializationInfo) {
+	public CompressedInputStreamManager(InputStream in, String fileNameOrPathOrExtension) {
 		this.in = in;
-		this.serializationInfo = serializationInfo;
-	}
-	
-	public InputStream getInputStream() {
-		return in;
-	}
-	
-	public String getSerializationInfo() {
-		return serializationInfo;
-	}
-	
-	public void setSerializationFormat(String serializationInfo) {
-		this.serializationInfo = serializationInfo;
-	}
-	
-	public SerializedInputStream uncompress() throws IOException {
-		return getUncompressedInputStream(in, serializationInfo);
-	}
-	
-
-	
-	public static SerializedInputStream getUncompressedInputStream(String filePath) throws IOException {
-		return getUncompressedInputStream(new FileInputStream(filePath), new File(filePath).getName());
-	}
-	
-	
-	public static SerializedInputStream getUncompressedInputStream(InputStream in, String serializationInfo) throws IOException {
 		
-		if (serializationInfo == null) {
-			throw new IllegalArgumentException("Serialization format is null");
+		String fileExtension = FilenameUtils.getExtension(fileNameOrPathOrExtension);
+		switch (fileExtension) {
+		case FileManager.FILE_EXTENSION_GZIP:
+		case FileManager.FILE_EXTENSION_ZIP:
+			compressionFormat = fileExtension;
+			fileExtensionNoCompressionFormat = FilenameUtils.getExtension(FilenameUtils.getBaseName(fileNameOrPathOrExtension));
+			fileExtension = fileExtensionNoCompressionFormat + "." + compressionFormat; 
+			break;
+		default:
+			compressionFormat = StringUtils.EMPTY;
+			fileExtensionNoCompressionFormat = fileExtension;
+			break;
 		}
 		
-		if (FileManager.checkFileHasExtension(serializationInfo, FileManager.FILE_EXTENSION_GZIP)) {
-			
-			return getUncompressedInputStream(
-					new GZIPInputStream(in),
-					FileManager.removeFileExtension(serializationInfo));
-			
-		} else if (FileManager.checkFileHasExtension(serializationInfo, FileManager.FILE_EXTENSION_ZIP)) {
-			
-			ZipInputStream zipInput = new ZipInputStream(in);
-			return getUncompressedInputStream(
-					zipInput,
-					zipInput.getNextEntry().getName());
-			
-		} else {
-			
-			return new SerializedInputStream(in, serializationInfo);
-			
-		}		
-		
+		this.fileExtension = fileExtension;
 		
 	}
 	
+	public String getCompressionFormat() {
+		return compressionFormat;
+	}
+	
+	public String getFileExtension() {
+		return fileExtension;
+	}
+	
+	public String getFileExtensionNoCompressionFormat() {
+		return fileExtensionNoCompressionFormat;
+	}
+	
+	public InputStream getUncompressedInputStream() throws IOException {
+		switch (compressionFormat) {
+		case FileManager.FILE_EXTENSION_GZIP:
+			return new GZIPInputStream(in);
+		case FileManager.FILE_EXTENSION_ZIP:
+			return new ZipInputStream(in);
+		default:
+			return in;
+		}
+	}		
 
 }

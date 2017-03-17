@@ -2,9 +2,7 @@ package fi.aalto.cs.drumbeat.common.params;
 
 import java.util.Collection;
 
-import fi.aalto.cs.drumbeat.common.SimpleTypes;
-
-public class IntegerParam extends TypedParam<Integer> {
+public class IntegerParam extends SimpleTypeParam<Integer> {
 
 	public IntegerParam() {
 		this(null, null);
@@ -31,7 +29,7 @@ public class IntegerParam extends TypedParam<Integer> {
 
 	@Override
 	public void setStringValue(String s) {
-		setValue(SimpleTypes.toInteger(s));
+		setValue(SimpleTypeConverter.toInteger(s));
 	}
 
 }

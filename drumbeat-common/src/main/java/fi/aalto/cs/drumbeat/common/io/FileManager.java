@@ -1,10 +1,14 @@
-package fi.aalto.cs.drumbeat.common.file;
+package fi.aalto.cs.drumbeat.common.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.io.FilenameUtils;
+
+import fi.aalto.cs.drumbeat.common.string.StringUtils;
 
 public class FileManager {
 	
@@ -31,14 +35,31 @@ public class FileManager {
 	
 	
 	
+	/**
+	 * @deprecated Use link {@link FilenameUtils}
+	 * 
+	 */
+	@Deprecated
 	public static String buildFilePath(String directoryPath, String fileName) {
 		return directoryPath != null ? String.format("%s%s%s", directoryPath, File.separatorChar, fileName) : fileName; 
 	}
 
+	/**
+	 * @deprecated Use link {@link FilenameUtils}
+	 * 
+	 */
+	@Deprecated
 	public static String buildFilePath(File directory, String fileName) {
 		return directory != null ? buildFilePath(directory.getPath(), fileName) : fileName;
 	}
 	
+	/**
+	 * Creates a {@link File} and makes parent directories if needed
+	 * 
+	 * @param filePath
+	 * @return
+	 * @throws IOException
+	 */
 	public static File createFile(String filePath) throws IOException {
 		File file = new File(filePath);
 		File parentFile = file.getParentFile();
@@ -60,7 +81,10 @@ public class FileManager {
 
 	public static FileOutputStream createFileOutputStream(String filePath) throws IOException {
 		File file = new File(filePath);
-		file.getParentFile().mkdirs();
+		File parentFile = file.getParentFile();
+		if (parentFile != null) {
+			parentFile.mkdirs();
+		}
 		return new FileOutputStream(file);
 	}
 	
@@ -69,6 +93,32 @@ public class FileManager {
 	    final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
 	    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
 	    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+	
+	public static int countLines(String filePath) throws IOException {
+//		LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(filePath));
+//		try {
+//			lineNumberReader.skip(Long.MAX_VALUE);
+//			return lineNumberReader.getLineNumber() + 1;
+//		} finally {
+//			lineNumberReader.close();
+//		}
+	    InputStream is = new BufferedInputStream(new FileInputStream(filePath));
+	    try {
+	        byte[] c = new byte[1024*128];
+	        int count = 0;
+	        int readChars;
+	        while ((readChars = is.read(c)) != -1) {
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	        }
+	        return count;
+	    } finally {
+	        is.close();
+	    }
 	}
 	
 //	public static String createFileNameWithExtension(String filePath, String extension) {
@@ -109,7 +159,9 @@ public class FileManager {
 	 * 
 	 * @param filePath
 	 * @return
+	 * @deprecated Use link {@link FilenameUtils}
 	 */
+	@Deprecated
 	public static String getFileName(String filePath) {
 		File file = new File(filePath);
 		return file.getName();
@@ -121,7 +173,9 @@ public class FileManager {
 	 * @param filePath
 	 * @param extension
 	 * @return
+	 * @deprecated Use link {@link FilenameUtils}
 	 */
+	@Deprecated
 	public static boolean checkFileHasExtension(String filePath, String extension) {
 		String fileName = getFileName(filePath);
 		int indexOfPoint = fileName.lastIndexOf('.');
@@ -135,7 +189,9 @@ public class FileManager {
 	 * @param filePath
 	 * @param extensions
 	 * @return
+	 * @deprecated Use link {@link FilenameUtils}
 	 */
+	@Deprecated
 	public static boolean checkFileHasAnyOfExtensions(String filePath, String... extensions) {
 		String fileName = getFileName(filePath);
 		int indexOfPoint = fileName.lastIndexOf('.');
@@ -154,7 +210,10 @@ public class FileManager {
 	 * 
 	 * @param filePath
 	 * @return
+	 * 
+	 * @deprecated Use link {@link FilenameUtils}
 	 */
+	@Deprecated
 	public static String removeFileExtension(String filePath) {
 		File file = new File(filePath);
 		File parent = file.getParentFile();
@@ -170,5 +229,66 @@ public class FileManager {
 	public static String replaceFileExtension(String filePath, String newExtension) {
 		return removeFileExtension(filePath) + "." + newExtension;
 	}
+	
+	public static String appendFileExtensions(String filePath, String... extensions) {
+		if (extensions != null && extensions.length > 0) {
+			
+			List<String> newExtensions = new ArrayList<>(extensions.length);
+			
+			for (int i = 0; i < extensions.length; ++i) {
+				if (!StringUtils.isEmptyOrNull(extensions[i])) {
+					newExtensions.add(extensions[i]);
+				}
+			}
+			
+			if (!newExtensions.isEmpty()) {
+			
+				LinkedList<String> similarFileExtensions = new LinkedList<>();
+				
+				String currentFilePath = filePath;			
+				String currentFileExtension;
+				
+				int missingIndex = 0;
+	
+				// find number of similar extensions and first missing index
+				while (!StringUtils.isEmptyOrNull(currentFileExtension = FilenameUtils.getExtension(currentFilePath)) &&
+						similarFileExtensions.size() < newExtensions.size()) {
+					
+					if (currentFileExtension.equals(newExtensions.get(missingIndex))) {
+						
+						++missingIndex;
+					
+						for (String similarFileExtension : similarFileExtensions) {
+							if (!similarFileExtension.equals(newExtensions.get(missingIndex++))) {
+								// reset missing index
+								missingIndex = 0;
+								break;
+							}
+						}
+						
+						break;
+						
+					} else {
+						
+						similarFileExtensions.push(currentFileExtension);
+						currentFilePath = FilenameUtils.removeExtension(currentFilePath);
+						
+					}
+						
+				}
+				
+				for (; missingIndex < newExtensions.size(); ++missingIndex) {
+					filePath += "." + newExtensions.get(missingIndex);
+				}
+				
+			}
+			
+		}
+		
+		return filePath;
+		
+	}
+	
+	
 
 }

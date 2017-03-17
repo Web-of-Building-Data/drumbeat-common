@@ -1,6 +1,6 @@
-package fi.aalto.cs.drumbeat.common;
+package fi.aalto.cs.drumbeat.common.params;
 
-public class SimpleTypes {
+public class SimpleTypeConverter {
 	
 	public static final String TRUE = "true"; 
 	public static final String FALSE = "false"; 

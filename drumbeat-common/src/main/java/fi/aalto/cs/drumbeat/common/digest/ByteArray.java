@@ -51,6 +51,17 @@ public class ByteArray implements Comparable<ByteArray> {
 		}
 	}
 
+	public ByteArray add(ByteArray other) {
+		return add(other.array);
+	}
+
+	public ByteArray add(byte[] operand) {
+		for (int i = 0; i < operand.length; ++i) {
+			this.array[i] += operand[i];
+		}
+		return this;
+	}
+
 	public ByteArray and(ByteArray other) {
 		return and(other.array);
 	}

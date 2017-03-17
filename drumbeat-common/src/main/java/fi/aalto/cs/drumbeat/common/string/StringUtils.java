@@ -1,5 +1,9 @@
 package fi.aalto.cs.drumbeat.common.string;
 
+import java.util.Map;
+
+import org.apache.commons.lang3.text.StrSubstitutor;
+
 public class StringUtils {
 
 	public static final char APOSTROPHE_CHAR = '\'';
@@ -259,5 +263,15 @@ public class StringUtils {
 	public static boolean isEmptyOrNull(String s) {
 		return s == null || s.length() == 0;
 	}
+	
+	
+	public static String substituteVariables(String format, Map<String, String> variableMap) {
+		if (format != null) {
+			return StrSubstitutor.replace(format, variableMap);		
+		} else {
+			return null;
+		}
+	}
+	
 
 }

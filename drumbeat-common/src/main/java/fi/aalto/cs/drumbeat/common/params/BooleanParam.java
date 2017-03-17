@@ -3,9 +3,7 @@ package fi.aalto.cs.drumbeat.common.params;
 import java.util.Arrays;
 import java.util.Collection;
 
-import fi.aalto.cs.drumbeat.common.SimpleTypes;
-
-public class BooleanParam extends TypedParam<Boolean> {
+public class BooleanParam extends SimpleTypeParam<Boolean> {
 	
 	public BooleanParam() {
 		this(null, null);
@@ -32,7 +30,7 @@ public class BooleanParam extends TypedParam<Boolean> {
 
 	@Override
 	public void setStringValue(String s) {
-		setValue(SimpleTypes.toBoolean(s));
+		setValue(SimpleTypeConverter.toBoolean(s));
 	}	
 
 }

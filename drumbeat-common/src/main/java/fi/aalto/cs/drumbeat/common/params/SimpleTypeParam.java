@@ -6,9 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import fi.aalto.cs.drumbeat.common.SimpleTypes;
-
-public abstract class TypedParam<T> {
+public abstract class SimpleTypeParam<T> {
 	
 	public static final String VALUE_NONE = "None";	
 	public static final String VALUE_NONE_DESCRIPTION = "None";
@@ -45,25 +43,25 @@ public abstract class TypedParam<T> {
 	private T defaultValue;
 	private boolean isMandatory;
 	
-	public TypedParam() {
+	public SimpleTypeParam() {
 		this(null, null);
 	}
 
-	public TypedParam(String name) {
+	public SimpleTypeParam(String name) {
 		this(name, null);
 	}
 	
-	public TypedParam(String name, String description) {
+	public SimpleTypeParam(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}
 	
-	public TypedParam(String name, String description, T value) {
+	public SimpleTypeParam(String name, String description, T value) {
 		this(name, description);
 		setValue(value);
 	}
 	
-	public TypedParam(String name, String description, T value, Collection<T> possibleValues, Collection<String> possibleValuesDescriptions, T defaultValue) {
+	public SimpleTypeParam(String name, String description, T value, Collection<T> possibleValues, Collection<String> possibleValuesDescriptions, T defaultValue) {
 		this(name, description);
 		setPossibleValues(possibleValues, possibleValuesDescriptions);
 		setDefaultValue(defaultValue);
@@ -87,7 +85,7 @@ public abstract class TypedParam<T> {
 	}
 	
 	public String getStringValue() {
-		return SimpleTypes.toString(getValue());
+		return SimpleTypeConverter.toString(getValue());
 	}
 	
 	public void setValue(T value) throws IllegalArgumentException {
@@ -156,12 +154,12 @@ public abstract class TypedParam<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public TypedParam<T> clone() {
+	public SimpleTypeParam<T> clone() {
 		try {
 			Constructor<T> constructor =  (Constructor<T>)getClass().getConstructor(
 					String.class,
 					String.class);
-			TypedParam<T> param = (TypedParam<T>)constructor.newInstance(name, null);
+			SimpleTypeParam<T> param = (SimpleTypeParam<T>)constructor.newInstance(name, null);
 			param.setPossibleValues(possibleValues, possibleValuesDescriptions);			
 			param.setValue(value);
 			param.setDefaultValue(defaultValue);
