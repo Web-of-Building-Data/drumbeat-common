@@ -1,6 +1,6 @@
 package fi.aalto.cs.drumbeat.common.meta;
 
-public class MetaClassUtils {
+public class AnnotationUtils {
 
 	/**
 	 * Get the method name for a depth in call stack. <br />
